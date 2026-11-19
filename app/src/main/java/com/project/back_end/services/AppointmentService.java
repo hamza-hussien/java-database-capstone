@@ -1,48 +1,54 @@
 
+
 package com.project.back_end.services;
 
 import com.project.back_end.models.Appointment;
+import com.project.back_end.repo.AppointmentRepository;
+
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
 public class AppointmentService {
 
-    private final List<Appointment> appointments = new ArrayList<>();
+    private final AppointmentRepository appointmentRepository;
 
+    public AppointmentService(
+            AppointmentRepository appointmentRepository) {
+        this.appointmentRepository = appointmentRepository;
+    }
+
+    // Book and save a new appointment
+    public Appointment bookAppointment(Appointment appointment) {
+        return appointmentRepository.save(appointment);
+    }
+
+    // Retrieve all appointments
     public List<Appointment> getAllAppointments() {
-        return appointments;
+        return appointmentRepository.findAll();
     }
 
-    public Appointment getAppointmentById(int id) {
-        return appointments.stream()
-                .filter(a -> a.getAppointmentId() == id)
-                .findFirst()
-                .orElse(null);
+    // Retrieve an appointment by ID
+    public Appointment getAppointmentById(Long id) {
+        return appointmentRepository.findById(id).orElse(null);
     }
 
-    public Appointment addAppointment(Appointment appointment) {
-        appointments.add(appointment);
-        return appointment;
+    // Retrieve appointments for a doctor on a specific date
+    public List<Appointment> getAppointmentsByDoctorAndDate(
+            Long doctorId, LocalDate date) {
+
+        return appointmentRepository
+                .findByDoctorIdAndAppointmentTimeBetween(
+                        doctorId,
+                        date.atStartOfDay(),
+                        date.plusDays(1).atStartOfDay()
+                );
     }
 
-    public Appointment updateAppointment(
-            int id, Appointment updatedAppointment) {
-
-        for (int i = 0; i < appointments.size(); i++) {
-            if (appointments.get(i).getAppointmentId() == id) {
-                appointments.set(i, updatedAppointment);
-                return updatedAppointment;
-            }
-        }
-
-        return null;
-    }
-
-    public boolean deleteAppointment(int id) {
-        return appointments.removeIf(
-                appointment -> appointment.getAppointmentId() == id);
+    // Delete an appointment
+    public void deleteAppointment(Long id) {
+        appointmentRepository.deleteById(id);
     }
 }
