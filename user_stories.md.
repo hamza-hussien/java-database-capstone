@@ -1,0 +1,21 @@
+User Stories
+1. Doctor
+As a Doctor, I want to log in securely so that I can access my account.
+As a Doctor, I want to view my appointments so that I can manage my schedule.
+As a Doctor, I want to view patient medical records so that I can provide appropriate treatment.
+As a Doctor, I want to update patient diagnoses and prescriptions.
+As a Doctor, I want to manage my availability for appointments.
+2. Patient
+As a Patient, I want to register and log in so that I can access my personal account.
+As a Patient, I want to view available doctors so that I can choose a suitable doctor.
+As a Patient, I want to book appointments online.
+As a Patient, I want to view and manage my appointments.
+As a Patient, I want to access my medical history and prescriptions.
+As a Patient, I want to update my personal information.
+3. Admin
+As an Admin, I want to log in securely so that I can manage the system.
+As an Admin, I want to add, update, and delete doctor accounts.
+As an Admin, I want to manage patient accounts.
+As an Admin, I want to manage appointments.
+As an Admin, I want to view system activity and generate reports.
+As an Admin, I want to manage user roles and permissions.
