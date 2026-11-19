@@ -1,48 +1,71 @@
 
 package com.project.back_end.controllers;
 
+import com.project.back_end.services.TokenService;
+import jakarta.validation.Valid;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.validation.BindingResult;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/prescriptions")
 public class PrescriptionController {
 
-    private final List<Prescription> prescriptions = new ArrayList<>();
+    private final TokenService tokenService;
 
-    public static class Prescription {
-        private int prescriptionId;
-        private int patientId;
-        private int doctorId;
+    public PrescriptionController(TokenService tokenService) {
+        this.tokenService = tokenService;
+    }
+
+    @PostMapping("/{token}")
+    public ResponseEntity<Map<String, String>> addPrescription(
+            @PathVariable String token,
+            @Valid @RequestBody PrescriptionRequest prescription,
+            BindingResult bindingResult) {
+
+        Map<String, String> response = new HashMap<>();
+
+        if (!tokenService.validateToken(token)) {
+            response.put("message", "Invalid token");
+            return ResponseEntity.status(401).body(response);
+        }
+
+        if (bindingResult.hasErrors()) {
+            response.put("message", "Invalid prescription data");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        // Save prescription here using your repository or service.
+        response.put("message", "Prescription submitted successfully");
+
+        return ResponseEntity.ok(response);
+    }
+
+    public static class PrescriptionRequest {
+
+        private Long patientId;
+        private Long doctorId;
         private String medication;
         private String dosage;
         private String instructions;
 
-        public Prescription() {
-        }
-
-        public int getPrescriptionId() {
-            return prescriptionId;
-        }
-
-        public void setPrescriptionId(int prescriptionId) {
-            this.prescriptionId = prescriptionId;
-        }
-
-        public int getPatientId() {
+        public Long getPatientId() {
             return patientId;
         }
 
-        public void setPatientId(int patientId) {
+        public void setPatientId(Long patientId) {
             this.patientId = patientId;
         }
 
-        public int getDoctorId() {
+        public Long getDoctorId() {
             return doctorId;
         }
 
-        public void setDoctorId(int doctorId) {
+        public void setDoctorId(Long doctorId) {
             this.doctorId = doctorId;
         }
 
@@ -70,34 +93,5 @@ public class PrescriptionController {
             this.instructions = instructions;
         }
     }
-
-    @GetMapping
-    public List<Prescription> getAllPrescriptions() {
-        return prescriptions;
-    }
-
-    @PostMapping
-    public Prescription addPrescription(
-            @RequestBody Prescription prescription) {
-        prescriptions.add(prescription);
-        return prescription;
-    }
-
-    @GetMapping("/{id}")
-    public Prescription getPrescriptionById(@PathVariable int id) {
-        return prescriptions.stream()
-                .filter(p -> p.getPrescriptionId() == id)
-                .findFirst()
-                .orElse(null);
-    }
-
-    @DeleteMapping("/{id}")
-    public String deletePrescription(@PathVariable int id) {
-        boolean removed = prescriptions.removeIf(
-                p -> p.getPrescriptionId() == id);
-
-        return removed
-                ? "Prescription deleted successfully"
-                : "Prescription not found";
-    }
 }
+
